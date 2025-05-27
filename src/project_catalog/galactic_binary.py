@@ -11,10 +11,10 @@ class GalacticBinary:
         self.name = name
         self.chain = chain
         self.candidates = candidates
-        self.params = ['Frequency', 'Amplitude', 'Inclination',
-                       'Initial Phase', 'Ecliptic Latitude',
-                       'Ecliptic Longitude', 'Polarization',
-                       'Frequency Derivative']
+        self.binary_params = ['Frequency', 'Amplitude', 'Inclination',
+                              'Initial Phase', 'Ecliptic Latitude',
+                              'Ecliptic Longitude', 'Polarization',
+                              'Frequency Derivative']
         print(f"Loaded {self.name} with {len(self.chain)} samples and {len(self.candidates)} candidates.")
 
     @classmethod
@@ -52,6 +52,11 @@ class GalacticBinary:
                                             'Initial Phase', 'Ecliptic Latitude',
                                             'Ecliptic Longitude', 'Polarization',
                                             'Frequency Derivative'])
+
+        # Wrap the polarization angle of candidates to be between 0 and pi (to match chain prior)
+        theta = cand_df["Polarization"].to_numpy().squeeze()
+        wrapped = np.abs(np.angle(np.exp(1j * theta)))
+        cand_df["Polarization"] = wrapped
         return cls(name, chain_df, cand_df)
 
     def save_feathers(self,
@@ -71,31 +76,37 @@ class GalacticBinary:
         self.chain.reset_index(drop=True).to_feather(chain_fp)
         self.candidates.reset_index(drop=True).to_feather(cand_fp)
 
-    def subset_chain(self) -> pd.DataFrame:
+    def get_binary_parameters_chain(self) -> pd.DataFrame:
         """
         Return a DataFrame with only the galactic binary parameter columns from the chain.
         """
-        return self.chain[self.params]
+        return self.chain[self.binary_params]
 
-    def subset_candidates(self) -> pd.DataFrame:
+    def get_binary_parameters_candidates(self) -> pd.DataFrame:
         """
         Return a DataFrame with only the galactic binary parameter columns from the candidates.
         """
-        # TODO (Aaron): Make sure that this is correct
-        # Wrap the polarization angle of candidates to be between 0 and pi (to match chain prior)
-        subset_df = self.candidates[self.params].copy()
-        theta = subset_df["Polarization"].values
-        wrapped = np.abs(np.angle(np.exp(1j * theta)))
-        subset_df["Polarization"] = wrapped
-        return subset_df
+        return self.candidates[self.binary_params]
+    
+    def get_sky_location_chain(self) -> pd.DataFrame:
+        """
+        Return a DataFrame with the sky location parameters from the chain.
+        """
+        return self.chain[['Ecliptic Latitude', 'Ecliptic Longitude']]
+
+    def get_sky_location_candidates(self) -> pd.DataFrame:
+        """
+        Return a DataFrame with the sky location parameters from the candidates.
+        """
+        return self.candidates[['Ecliptic Latitude', 'Ecliptic Longitude']]
 
     def corner_plot(self, candidate_index: int, **kwargs):
         """
         Plot the corner plot of the chain.
         """
-        fig = corner(self.subset_chain(),
-                     truths = self.subset_candidates().iloc[candidate_index],
-                     labels = self.params,
+        fig = corner(self.get_binary_parameters_chain(),
+                     truths = self.get_binary_parameters_candidates().iloc[candidate_index],
+                     labels = self.binary_params,
                      **kwargs)
         fig.suptitle(self.name)
         return fig
