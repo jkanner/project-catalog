@@ -4,7 +4,7 @@
 Awesome project to evaluate catalogs of ultra-compact binaries.
 
 ## Data
-The `data` folder for this project can be downloaded at this Google Drive link: [Google Drive](https://drive.google.com/drive/folders/1JHAnVkGTBt_QVuZW3AU24zRuDQbEOt4P?usp=sharing).
+The `data` folder for this project can be downloaded at this Google Drive link: [Google Drive](https://drive.google.com/drive/folders/1RSXU9adrKOXrwFQLIPHRD-et-2Q-Mw4T?usp=sharing).
 
 Put the `data` folder in the root directory of the project. It should look like `.../project-catalogs/data`.
 
