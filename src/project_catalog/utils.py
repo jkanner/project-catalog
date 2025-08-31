@@ -23,7 +23,7 @@ def check_injection_match(galactic_binary: GalacticBinary, injection_index: int,
                    'Frequency Derivative HDR']
     name = galactic_binary.name
     injection_name = galactic_binary.injections["Name"][injection_index]
-    masked_df = hdr_dataframe[(hdr_dataframe["Name"] == name) & (hdr_dataframe["Candidate"] == injection_name)][hdr_params]
+    masked_df = hdr_dataframe[(hdr_dataframe["Name"] == name) & (hdr_dataframe["Injection"] == injection_name)][hdr_params]
     if masked_df.empty is True:
         print(name, injection_name)
         return False
@@ -41,7 +41,7 @@ def check_sky_location_support(galactic_binary: GalacticBinary, injection_index:
     hdr_params = ['Sky Location HDR']
     name = galactic_binary.name
     injection_name = galactic_binary.injections["Name"][injection_index]
-    masked_df = hdr_dataframe[(hdr_dataframe["Name"] == name) & (hdr_dataframe["Candidate"] == injection_name)][hdr_params]
+    masked_df = hdr_dataframe[(hdr_dataframe["Name"] == name) & (hdr_dataframe["Injection"] == injection_name)][hdr_params]
     if masked_df.empty is True:
         print(name, injection_name)
         return False
