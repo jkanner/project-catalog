@@ -15,7 +15,7 @@ def check_injection_match(galactic_binary: GalacticBinary, injection_index: int,
     # threshold is the maximum allowed HDR (1 - alpha)%
     alpha = 1.0 - threshold
     # correct for multiple 1D trials (8 parameters)
-    threshold = multiple_trial_correction(alpha, ndims=8)
+    threshold = multiple_trial_correction(alpha, ntrials=8)
 
     hdr_params = ['Frequency HDR', 'Amplitude HDR', 'Inclination HDR',
                    'Initial Phase HDR', 'Ecliptic Latitude HDR',
@@ -36,7 +36,7 @@ def check_sky_location_support(galactic_binary: GalacticBinary, injection_index:
     # threshold is the maximum allowed HDR (1 - alpha)%
     alpha = 1.0 - threshold
     # correct for multiple 1D trials (8 parameters)
-    threshold = multiple_trial_correction(alpha, ndims=8)
+    threshold = multiple_trial_correction(alpha, ntrials=8)
 
     hdr_params = ['Sky Location HDR']
     name = galactic_binary.name
