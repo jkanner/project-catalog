@@ -42,18 +42,17 @@ class GalacticBinary:
         _dir : path to directory containing '*_injections.feather'
         """
         if posterior_dir is None:
-            posterior_dir = Path(__file__).parent.parent.parent / "data/posterior_chains/"
+            posterior_dir = Path(__file__).parent.parent.parent / "data/erebor/posterior_chains/"
         if injections_dir is None:
-            injections_dir = Path(__file__).parent.parent.parent / "data/injection_matches/"
+            injections_dir = Path(__file__).parent.parent.parent / "data/erebor/injection_matches/"
         posterior_fp = Path(posterior_dir) / f"{name}_posterior.feather"
-        suffix = "_injections.feather"
-        injections_fp = Path(injections_dir) / f"{name}{suffix}"
+        injections_fp = Path(injections_dir) / f"{name}_injections.feather"
         try:
             posterior_df = pd.read_feather(posterior_fp)
-            # TODO (Aaron): Come back and try to use all samples
-            if posterior_df.shape[0] > 10_000:
-                thin_factor = 10
-                posterior_df = posterior_df.iloc[::thin_factor].reset_index(drop=True)
+            # # TODO (Aaron): Come back and try to use all samples
+            # if posterior_df.shape[0] > 10_000:
+            #     thin_factor = 10
+            #     posterior_df = posterior_df.iloc[::thin_factor].reset_index(drop=True)
         except FileNotFoundError:
             raise FileNotFoundError(f"Posterior file {injections_fp} not found.")
         try:
@@ -82,6 +81,19 @@ class GalacticBinary:
         # Feather requires a default RangeIndex
         self.posterior.reset_index(drop=True).to_feather(posterior_fp)
         self.injections.reset_index(drop=True).to_feather(injections_fp)
+
+
+    def get_posterior(self) -> pd.DataFrame:
+        """
+        Return the full posterior DataFrame.
+        """
+        return self.posterior
+
+    def get_injections(self) -> pd.DataFrame:
+        """
+        Return the full injections DataFrame.
+        """
+        return self.injections
 
     def get_binary_parameters_posterior(self) -> pd.DataFrame:
         """
@@ -112,7 +124,7 @@ class GalacticBinary:
         Show the corner plot of the posterior.
         """
         fig = corner(self.get_binary_parameters_posterior(),
-                     truths = self.get_binary_parameters_injections().iloc[injection_index],
+                     truths = self.get_binary_parameters_injections().to_numpy()[injection_index],
                      labels = self.binary_params,
                      **plot_kwargs)
         fig.suptitle(self.name)
